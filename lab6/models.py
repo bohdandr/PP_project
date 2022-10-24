@@ -1,13 +1,8 @@
-from typing import Optional
-from sqlalchemy import ForeignKey
-from sqlalchemy import String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Float, Enum, DateTime
-from sqlalchemy.sql import func
 import datetime
 
 DB_URL = "mysql://root:password@localhost:3306/pp_project"
