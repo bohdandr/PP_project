@@ -34,7 +34,6 @@ class Transaction(BaseModel):
     sentByUser = Column(Integer, ForeignKey("user.id"))
     sentToUser = Column(Integer, ForeignKey("user.id"))
     value = Column(Float)
-    # datePerformed = Column(Date)
     datePerformed = Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
     fromUser = relationship(User, foreign_keys=[sentByUser], backref="transactions_from", lazy="joined")
     toUser = relationship(User, foreign_keys=[sentToUser], backref="transactions_to", lazy="joined")
