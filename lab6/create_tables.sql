@@ -4,7 +4,7 @@ CREATE TABLE user (
     firstName VARCHAR(32),
     lastName VARCHAR(32),
     email VARCHAR(64),
-    password VARCHAR(32),
+    password VARCHAR(128),
     phone VARCHAR(32),
     birthDate DATE,
     wallet FLOAT,
@@ -21,5 +21,6 @@ CREATE TABLE transaction (
     FOREIGN KEY(sentToUser) REFERENCES user(id)
 );
 
--- mysql -u root -p pp_project
--- source /Users/Stepan/Polytech/semester3/AP/AP_Bohdan/PP_Project/lab6/create_tables.sql
+-- mysql -u root -p ap
+-- source F:/bohdan/3_sem/PP_project/lab6/create_tables.sql
+

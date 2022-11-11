@@ -27,7 +27,7 @@ def upgrade() -> None:
         sa.Column('firstName', sa.VARCHAR(32)),
         sa.Column('lastName', sa.VARCHAR(32)),
         sa.Column('email', sa.VARCHAR(64)),
-        sa.Column('password', sa.VARCHAR(32)),
+        sa.Column('password', sa.VARCHAR(128)),
         sa.Column('phone', sa.VARCHAR(32)),
         sa.Column('birthDate', sa.Date),
         sa.Column('wallet', sa.Float),

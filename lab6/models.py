@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Float, Enum, DateTime
 import datetime
 
-DB_URL = "mysql://root:password@localhost:3306/pp_project"
+DB_URL = "mysql://root:$ygnivkA12@localhost:3306/ap"
 
 engine = create_engine(DB_URL)
 SessionFactory = sessionmaker(bind=engine)
