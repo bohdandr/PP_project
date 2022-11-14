@@ -82,15 +82,12 @@ def hello_world():
 
 @api_blueprint.route("/user", methods=["POST"])
 def create_user():
-    try:
-        user_data=CreateUser().load(request.json)
-        if db_utils.is_name_taken(User, user_data["username"]):
-            return StatusResponse(jsonify({"error": "User with entered username already exists"}), 402)
-    except marshmallow.ValidationError:
-        return StatusResponse(jsonify({"error": "Validation error"}), 400)
-    user=db_utils.create_entry(User,**user_data)
-    return StatusResponse(jsonify(UserData().dump(user)),200)
+    user_data = CreateUser().load(request.json)
+    if db_utils.is_name_taken(User, user_data["username"]):
+        return StatusResponse(jsonify({"error": "Username is already taken"}), 401)
 
+    user = db_utils.create_entry(User, **user_data)
+    return StatusResponse(jsonify(UserData().dump(user)), 200)
 
 @api_blueprint.route("/user/<int:user_id>", methods=["GET"])
 def get_user_by_id(user_id):
@@ -100,10 +97,7 @@ def get_user_by_id(user_id):
 @api_blueprint.route("/user/<int:user_id>", methods=["DELETE"])
 def delete_user_by_id(user_id):
     user = db_utils.get_entry_by_uid(User, user_id)
-    user_data = {"userStatus": "0", "username": "0",
-                 "firstName": "0", "lastName": "0", "email": "0",
-                 "password": "0", "phone": "0",
-                 "birthDate": "0-0-0", "wallet": 0, "user": 0}
+    user_data = {"userStatus": "0", "username": "0"}
     db_utils.update_entry(user, **user_data)
     return StatusResponse(jsonify(UserData().dump(user)),200)
 
@@ -119,10 +113,7 @@ def user_self():
 
     if request.method=="DELETE":
         user=db_utils.get_entry_by_uid(User,selfid)
-        user_data={"userStatus":"0", "username": "0",
-	"firstName": "0", "lastName": "0", "email": "0",
-    "password": "0", "phone": "0",
-    "birthDate": "0-0-0", "wallet": 0, "user":0}
+        user_data={"userStatus": "0", "username": "0"}
         db_utils.update_entry(user,**user_data)
         return StatusResponse(jsonify(UserData().dump(user)),200)
 
@@ -148,6 +139,8 @@ def user_withdraw():
     selfid = 30
     val = request.json['value']
     user = db_utils.get_entry_by_uid(User, selfid)
+    if (user.wallet - val)<0:
+        return StatusResponse(jsonify({"error": "user has not enough money to withdraw"}), 402)
     user.wallet = user.wallet - val
     user_data = {"wallet": user.wallet}
     db_utils.update_entry(user, **user_data)
@@ -156,7 +149,7 @@ def user_withdraw():
 
 @api_blueprint.route("/transaction/<string:usrname>", methods=["POST"])
 def create_transaction(usrname):
-    user_name="beb8"
+    user_name="beb10"
 
     transaction_data = CreateTransaction().load(request.json)
     transaction = db_utils.create_entry(Transaction, **transaction_data)
@@ -172,33 +165,16 @@ def create_transaction(usrname):
     user1.wallet = user1.wallet - val
     user2.wallet = user2.wallet + val
 
-
     user_data1 = {"wallet": user1.wallet}
     user_data2 = {"wallet": user2.wallet}
     db_utils.update_entry(user1, **user_data1)
     db_utils.update_entry(user2, **user_data2)
 
-
     return jsonify(TransactionData().dump(transaction))
-
-
-    # userid1 = orderinfo.get('userId')
-    # userid2 = orderinfo.get('classroomId')
-    #
-    # userData1=db_utils.get_entry_by_username(User,usrname)
-    # userData2 = db_utils.get_entry_by_username(User, user_name)
-    #
-    #
-    # datePerformed = request.json['datePerformed']
-    # dt = datetime.strptime(datePerformed, "%Y-%m-%d %H:%M:%S")
-    #
-    # transaction = db_utils.get_entry_by_username(User, usrname)
-    # db_utils.create_transaction(transaction, **transaction_data)
-    # return jsonify(TransactionData().dump(transaction))
 
 @api_blueprint.route("/transaction/sent", methods=["GET"])
 def sent_transaction():
-    selfid=24
+    selfid=1
     transactions = db_utils.find_transactions_by_userid(selfid)
     ans = [TransactionData().dump(x) for x in transactions]
 

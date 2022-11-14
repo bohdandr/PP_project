@@ -10,11 +10,6 @@ def is_name_taken(model_class, name):
 	if model_class == User:
 		return session.query(exists().where(model_class.username == name)).scalar()
 
-def id_exists(model_class, uid):
-	session = Session()
-	return session.query(exists().where(model_class.id == uid)).scalar()
-
-
 def create_entry(model_class, *, commit=True, **kwargs):
 	session = Session()
 	entry = model_class(**kwargs)
@@ -63,17 +58,6 @@ def get_value_withdraw(entry, val, *, commit=True, **kwargs):
 def get_wallet_by_uid(model_class, uid, **kwargs):
 	session = Session()
 	return session.query(model_class).filter_by(id=id, **kwargs).one()
-
-
-def update_wallet(entry, val, *, commit=True, **kwargs):
-	session = Session()
-	for key, value in kwargs.items():
-		if key == "wallet":
-			value += val
-		setattr(entry, key, value)
-	if commit:
-		session.commit()
-	return entry
 
 
 def find_transactions_by_userid(sentuserid):

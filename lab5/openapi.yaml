@@ -284,7 +284,6 @@ paths:
         - moneytransfer_auth: []
 
 
-
   /transaction/{username}:
     post:
       tags:
