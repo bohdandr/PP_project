@@ -8,11 +8,6 @@ def is_name_taken(model_class, name):
 		return session.query(exists().where(model_class.username == name)).scalar()
 
 
-def id_exists(model_class, uid):
-	session = Session()
-	return session.query(exists().where(model_class.id == uid)).scalar()
-
-
 def create_entry(model_class, *, commit=True, **kwargs):
 	session = Session()
 	entry = model_class(**kwargs)
