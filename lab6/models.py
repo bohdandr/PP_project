@@ -5,7 +5,8 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Float, Enum, DateTime
 import datetime
 
-DB_URL = "mysql://root:$ygnivkA12@localhost:3306/ap"
+# DB_URL = "mysql://root:$ygnivkA12@localhost:3306/ap"
+DB_URL = "mysql://root:E100_amx1390_maus@localhost:3306/pp_project"
 
 engine = create_engine(DB_URL)
 SessionFactory = sessionmaker(bind=engine)
@@ -24,7 +25,7 @@ class User(BaseModel):
     password = Column(String)
     phone = Column(String)
     birthDate = Column(Date)
-    wallet = Column(Float)
+    wallet = Column(Float, default=0)
     userStatus = Column(Enum('0', '1'), default='1')
 
 

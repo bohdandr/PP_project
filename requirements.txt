@@ -10,3 +10,5 @@ Werkzeug==2.2.2
 zipp==3.8.1
 
 SQLAlchemy~=1.4.42
+marshmallow~=3.19.0
+alembic~=1.8.1
