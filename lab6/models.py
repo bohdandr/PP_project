@@ -27,6 +27,7 @@ class User(BaseModel):
     birthDate = Column(Date)
     wallet = Column(Float, default=0)
     userStatus = Column(Enum('0', '1'), default='1')
+    isAdmin = Column(Enum('0', '1'), default='0')
 
 
 class Transaction(BaseModel):

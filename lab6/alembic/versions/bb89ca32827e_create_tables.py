@@ -28,7 +28,8 @@ def upgrade() -> None:
         sa.Column('phone', sa.VARCHAR(32)),
         sa.Column('birthDate', sa.Date),
         sa.Column('wallet', sa.Float),
-        sa.Column('userStatus', sa.Enum('0', '1'), default='1')
+        sa.Column('userStatus', sa.Enum('0', '1'), default='1'),
+        sa.Column('isAdmin', sa.Enum('0', '1'), default='0')
     )
 
     op.create_table(
