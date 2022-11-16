@@ -115,7 +115,7 @@ def create_user():
     password = request.authorization.password
     user = verify_password(username, password)
     if (user is None or db_utils.get_entry_by_username(User, username).isAdmin == '0') and \
-        'isAdmin' in user_data.keys() and user_data['isAdmin'] == '1':
+            'isAdmin' in user_data.keys() and user_data['isAdmin'] == '1':
         return StatusResponse(jsonify({"error": "Only admins can create other admins"}), 405)
 
     user = db_utils.create_entry(User, **user_data)

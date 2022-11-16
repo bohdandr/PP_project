@@ -589,11 +589,11 @@ components:
           format: int64
           example: 7
         sentByUser:
-          type: string
-          example: sentByUsername
+          type: integer
+          example: sentByUserid
         sentToUser:
-          type: string
-          example: sentToUsername
+          type: integer
+          example: sentToUserid
         value:
           type: number
           format: double
