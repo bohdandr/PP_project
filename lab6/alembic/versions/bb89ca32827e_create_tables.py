@@ -15,9 +15,6 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-from alembic import op
-import sqlalchemy as sa
-
 
 def upgrade() -> None:
     op.create_table(
@@ -31,7 +28,8 @@ def upgrade() -> None:
         sa.Column('phone', sa.VARCHAR(32)),
         sa.Column('birthDate', sa.Date),
         sa.Column('wallet', sa.Float),
-        sa.Column('userStatus', sa.Enum('0', '1'), default='1')
+        sa.Column('userStatus', sa.Enum('0', '1'), default='1'),
+        sa.Column('isAdmin', sa.Enum('0', '1'), default='0')
     )
 
     op.create_table(
@@ -40,7 +38,6 @@ def upgrade() -> None:
         sa.Column('sentByUser', sa.Integer, sa.ForeignKey("user.id")),
         sa.Column('sentToUser', sa.Integer, sa.ForeignKey("user.id")),
         sa.Column('value', sa.Float),
-        # sa.Column('datePerformed', sa.Date),
         sa.Column('datePerformed', sa.DateTime, server_default=sa.func.current_timestamp())
     )
 
