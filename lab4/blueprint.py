@@ -27,12 +27,11 @@ api_blueprint = Blueprint('api', __name__)
 STUDENT_ID = 1
 
 
-# def verify_password(username, password):
-#     print(username, password)
-#     print("beb")
-#     user = db_utils.get_entry_by_username(User, username)
-#     if check_password_hash(user.password, password):
-#         return username
+def verify_password(username, password):
+    user = db_utils.get_entry_by_username(User, username)
+    if check_password_hash(user.password, password):
+        return username
+    return None
 
 
 def admin_required(func):
@@ -114,9 +113,10 @@ def create_user():
     if db_utils.is_name_taken(User, user_data["username"]):
         return StatusResponse(jsonify({"error": "Username is already taken"}), 401)
 
-    username = auth.current_user()
-
-    if (username is None or db_utils.get_entry_by_username(User, username).isAdmin == '0') and \
+    username = request.authorization.username
+    password = request.authorization.password
+    user = verify_password(username, password)
+    if (user is None or db_utils.get_entry_by_username(User, username).isAdmin == '0') and \
         'isAdmin' in user_data.keys() and user_data['isAdmin'] == '1':
         return StatusResponse(jsonify({"error": "Only admins can create other admins"}), 405)
 
