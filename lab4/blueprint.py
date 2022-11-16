@@ -1,6 +1,9 @@
+import json
 import sys
 from datetime import datetime
-
+from flask_bcrypt import check_password_hash, generate_password_hash
+from flask_httpauth import HTTPBasicAuth
+from flask import Flask
 import marshmallow
 import sqlalchemy
 
@@ -19,8 +22,30 @@ from lab7.schemas import (
 )
 
 errors = Blueprint('errors', __name__)
+auth = HTTPBasicAuth()
 api_blueprint = Blueprint('api', __name__)
 STUDENT_ID = 1
+
+
+# def verify_password(username, password):
+#     print(username, password)
+#     print("beb")
+#     user = db_utils.get_entry_by_username(User, username)
+#     if check_password_hash(user.password, password):
+#         return username
+
+
+def admin_required(func):
+    def wrapper(*args, **kwargs):
+        username = auth.current_user()
+        user = db_utils.get_entry_by_username(User, username)
+        if user.isAdmin == '1':
+            return func(*args, **kwargs)
+        else:
+            return StatusResponse(jsonify({"error": f"User must be an admin to use {func.__name__}."}), 401)
+
+    wrapper.__name__ = func.__name__
+    return wrapper
 
 
 @errors.app_errorhandler(sqlalchemy.exc.NoResultFound)
@@ -89,16 +114,37 @@ def create_user():
     if db_utils.is_name_taken(User, user_data["username"]):
         return StatusResponse(jsonify({"error": "Username is already taken"}), 401)
 
+    username = auth.current_user()
+
+    if (username is None or db_utils.get_entry_by_username(User, username).isAdmin == '0') and \
+        'isAdmin' in user_data.keys() and user_data['isAdmin'] == '1':
+        return StatusResponse(jsonify({"error": "Only admins can create other admins"}), 405)
+
     user = db_utils.create_entry(User, **user_data)
     return StatusResponse(jsonify(UserData().dump(user)), 200)
 
+
+@api_blueprint.route("/login")
+@auth.verify_password
+def login(username, password):
+    user = db_utils.get_entry_by_username(User, username)
+    if check_password_hash(user.password, password):
+        return True
+
+    return False
+
+
 @api_blueprint.route("/user/<int:user_id>", methods=["GET"])
+@auth.login_required
+@admin_required
 def get_user_by_id(user_id):
     user = db_utils.get_entry_by_uid(User, user_id)
     return StatusResponse(jsonify(GetUser().dump(user)), 200)
 
 
 @api_blueprint.route("/user/<int:user_id>", methods=["DELETE"])
+@auth.login_required
+@admin_required
 def delete_user_by_id(user_id):
     user = db_utils.get_entry_by_uid(User, user_id)
     user_data = {"userStatus": "0", "username": "0"}
@@ -107,8 +153,11 @@ def delete_user_by_id(user_id):
 
 
 @api_blueprint.route("/user/self", methods=["GET", "DELETE", "PUT"])
+@auth.login_required
 def user_self():
-    selfid = 28
+    username = auth.current_user()
+    user = db_utils.get_entry_by_username(User, username)
+    selfid = user.id
 
     if request.method == "GET":
         user = db_utils.get_entry_by_uid(User, selfid)
@@ -128,8 +177,12 @@ def user_self():
 
 
 @api_blueprint.route("/user/replenish", methods=["PUT"])
+@auth.login_required
 def user_replenish():
-    selfid = 30
+    username = auth.current_user()
+    user = db_utils.get_entry_by_username(User, username)
+    selfid = user.id
+
     val = request.json['value']
     user = db_utils.get_entry_by_uid(User, selfid)
     user.wallet = user.wallet + val
@@ -139,11 +192,15 @@ def user_replenish():
 
 
 @api_blueprint.route("/user/withdraw", methods=["PUT"])
+@auth.login_required
 def user_withdraw():
-    selfid = 30
+    username = auth.current_user()
+    user = db_utils.get_entry_by_username(User, username)
+    selfid = user.id
+
     val = request.json['value']
     user = db_utils.get_entry_by_uid(User, selfid)
-    if (user.wallet - val)<0:
+    if (user.wallet - val) < 0:
         return StatusResponse(jsonify({"error": "user has not enough money to withdraw"}), 402)
     user.wallet = user.wallet - val
     user_data = {"wallet": user.wallet}
@@ -151,26 +208,37 @@ def user_withdraw():
     return StatusResponse(jsonify(UserData().dump(user)), 200)
 
 
-@api_blueprint.route("/transaction/<string:username>", methods=["POST"])
-def create_transaction(username):
-    user_name = "beb3"
+@api_blueprint.route("/transaction/<string:usernameto>", methods=["POST"])
+@auth.login_required
+def create_transaction(usernameto):
+    username = auth.current_user()
+    user = db_utils.get_entry_by_username(User, username)
+    selfid = user.id
 
+    userto = db_utils.get_entry_by_username(User, usernameto)
+    useridto = userto.id
 
-    transaction_data = CreateTransaction().load(request.json)
+    param = request.json
+    param.update({"sentByUser": selfid, "sentToUser": useridto, })
+    paramjson = json.dumps(param)
+
+    transaction_data = CreateTransaction().load(json.loads(paramjson))
     transaction = db_utils.create_entry(Transaction, **transaction_data)
 
     val = request.json['value']
 
-    user1 = db_utils.get_entry_by_username(User, user_name)
-    user2 = db_utils.get_entry_by_username(User, username)
+    user1 = db_utils.get_entry_by_username(User, username)
+    user2 = db_utils.get_entry_by_username(User, usernameto)
 
     if (user1.wallet - val) < 0:
-        return StatusResponse(jsonify({"error": "value of wallet must be positive"}), 402)
+        return StatusResponse(jsonify({"error": "user do not have enough money to send"}), 402)
+
     user1.wallet = user1.wallet - val
     user2.wallet = user2.wallet + val
 
     user_data1 = {"wallet": user1.wallet}
     user_data2 = {"wallet": user2.wallet}
+
     db_utils.update_entry(user1, **user_data1)
     db_utils.update_entry(user2, **user_data2)
 
@@ -178,8 +246,12 @@ def create_transaction(username):
 
 
 @api_blueprint.route("/transaction/sent", methods=["GET"])
+@auth.login_required
 def sent_transaction():
-    selfid=1
+    username = auth.current_user()
+    user = db_utils.get_entry_by_username(User, username)
+    selfid = user.id
+
     transactions = db_utils.find_transactions_by_userid(selfid)
     ans = [TransactionData().dump(x) for x in transactions]
 
@@ -187,8 +259,12 @@ def sent_transaction():
 
 
 @api_blueprint.route("/transaction/recieved", methods=["GET"])
+@auth.login_required
 def recieved_transaction():
-    selfid = 25
+    username = auth.current_user()
+    user = db_utils.get_entry_by_username(User, username)
+    selfid = user.id
+
     transactions = db_utils.find_transactions_to_userid(selfid)
     ans = [TransactionData().dump(x) for x in transactions]
 
@@ -196,6 +272,8 @@ def recieved_transaction():
 
 
 @api_blueprint.route("/transaction/sent/<string:username>", methods=["GET"])
+@auth.login_required
+@admin_required
 def sent_transaction_username(username):
     user = db_utils.get_entry_by_username(User, username)
     uid = user.id
@@ -206,6 +284,8 @@ def sent_transaction_username(username):
 
 
 @api_blueprint.route("/transaction/recieved/<string:username>", methods=["GET"])
+@auth.login_required
+@admin_required
 def recieved_transaction_username(username):
     user = db_utils.get_entry_by_username(User, username)
     uid = user.id

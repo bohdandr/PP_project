@@ -14,6 +14,7 @@ class UserData(Schema):
     birthDate = fields.Date()
     wallet = fields.Float()
     userStatus = fields.String()
+    isAdmin = fields.String()
 
 
 class GetUser(Schema):
@@ -25,6 +26,7 @@ class GetUser(Schema):
     phone = fields.String()
     birthDate = fields.Date()
     userStatus = fields.String()
+    isAdmin = fields.String()
 
 
 class CreateUser(Schema):
@@ -36,6 +38,7 @@ class CreateUser(Schema):
     phone = fields.Function(validate=validate.Regexp('^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[\s0-9]{4,20}$'))
     birthDate = fields.Date(validate=lambda x: x < date.today())
     wallet = fields.Float(validate=validate.Range(min=0))
+    isAdmin = fields.String(validate=validate.OneOf(choices=['0', '1']))
 
 
 class UserToUpdate(Schema):
