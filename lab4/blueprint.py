@@ -1,9 +1,7 @@
 import json
 import sys
-from datetime import datetime
-from flask_bcrypt import check_password_hash, generate_password_hash
+from flask_bcrypt import check_password_hash
 from flask_httpauth import HTTPBasicAuth
-from flask import Flask
 import marshmallow
 import sqlalchemy
 

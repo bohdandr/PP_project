@@ -1,6 +1,6 @@
 from flask_bcrypt import generate_password_hash
 from marshmallow import validate, Schema, fields
-from datetime import date, datetime
+from datetime import date
 
 
 class UserData(Schema):
@@ -57,15 +57,7 @@ class TransactionData(Schema):
     datePerformed = fields.DateTime()
 
 
-# class Transaction(Schema):
-#     sentByUser=fields.String()
-#     sentToUser=fields.String()
-#     value=fields.Float()
-#     datePerformed=fields.Date()
-
-
 class CreateTransaction(Schema):
     sentByUser = fields.Integer(required=True, validate=validate.Range(min=1))
     sentToUser = fields.Integer(required=True, validate=validate.Range(min=1))
     value = fields.Float(required=True, validate=validate.Range(min=0))
-    # datePerformed = fields.DateTime(validate=lambda x: x <= datetime.today())

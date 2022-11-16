@@ -38,7 +38,6 @@ def upgrade() -> None:
         sa.Column('sentByUser', sa.Integer, sa.ForeignKey("user.id")),
         sa.Column('sentToUser', sa.Integer, sa.ForeignKey("user.id")),
         sa.Column('value', sa.Float),
-        # sa.Column('datePerformed', sa.Date),
         sa.Column('datePerformed', sa.DateTime, server_default=sa.func.current_timestamp())
     )
 

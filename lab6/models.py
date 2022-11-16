@@ -39,6 +39,3 @@ class Transaction(BaseModel):
     datePerformed = Column(DateTime(timezone=True), default=datetime.datetime.utcnow)
     fromUser = relationship(User, foreign_keys=[sentByUser], backref="transactions_from", lazy="joined")
     toUser = relationship(User, foreign_keys=[sentToUser], backref="transactions_to", lazy="joined")
-
-
-
