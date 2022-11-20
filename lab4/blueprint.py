@@ -111,10 +111,14 @@ def create_user():
     if db_utils.is_name_taken(User, user_data["username"]):
         return StatusResponse(jsonify({"error": "Username is already taken"}), 401)
 
-    username = request.authorization.username
-    password = request.authorization.password
-    user = verify_password(username, password)
-    if (user is None or db_utils.get_entry_by_username(User, username).isAdmin == '0') and \
+    user = None
+    if request.authorization is not None:
+        username = request.authorization.username
+        password = request.authorization.password
+        user = verify_password(username, password)
+
+    if (request.authorization is None or user is None
+            or db_utils.get_entry_by_username(User, username).isAdmin == '0') and \
             'isAdmin' in user_data.keys() and user_data['isAdmin'] == '1':
         return StatusResponse(jsonify({"error": "Only admins can create other admins"}), 405)
 
