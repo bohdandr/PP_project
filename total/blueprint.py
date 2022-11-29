@@ -117,6 +117,9 @@ def create_user():
         password = request.authorization.password
         user = verify_password(username, password)
 
+    if user_data['isAdmin'] == '1':
+        return make_response("You can't create admin", 405)
+
     if (request.authorization is None or user is None
             or db_utils.get_entry_by_username(User, username).isAdmin == '0') and \
             'isAdmin' in user_data.keys() and user_data['isAdmin'] == '1':
@@ -186,6 +189,8 @@ def user_replenish():
     selfid = user.id
 
     val = request.json['value']
+    if(val<0):
+        return StatusResponse(jsonify({"error": "the value variable must be a positive value"}), 402)
     user = db_utils.get_entry_by_uid(User, selfid)
     user.wallet = user.wallet + val
     user_data = {"wallet": user.wallet}

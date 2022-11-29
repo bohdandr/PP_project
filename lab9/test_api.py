@@ -518,3 +518,7 @@ class TestTransactionAction(BaseTestCase):
 
 if __name__ == "__main__":
 	unittest.main()
+
+
+# coverage run --source ./total -m unittest discover lab9
+# coverage report -m
