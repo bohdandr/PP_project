@@ -4,10 +4,10 @@ info:
   title: Money Transfer - OpenAPI 3.0
   description: Service for transfering money between people.
   version: 1.0.11
-  
+
 servers:
   - url: url
-  
+
 tags:
   - name: user
     description: Operations about user
@@ -40,10 +40,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserData'
             application/xml:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserData'
         '400':
           description: Entered invalid data
         '401':
@@ -92,23 +92,7 @@ paths:
                 type: string
         '400':
           description: Invalid username/password supplied
-          
-  /user/logout:
-    get:
-      tags:
-        - user
-      summary: Logs out current logged-in user session
-      description: This can only be done by the logged-in user.
-      operationId: logoutUser
-      parameters: []
-      responses:
-        '200':
-          description: successful operation
-        '401':
-          description: user must be logged-in
-      security:
-        - moneytransfer_auth: []
-        
+
   /user/self:
     get:
       tags:
@@ -123,13 +107,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'          
+                $ref: '#/components/schemas/UserData'
             application/xml:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserData'
         '401':
           description: User must be logged in
-      security: 
+      security:
         - moneytransfer_auth: []
     put:
       tags:
@@ -171,7 +155,7 @@ paths:
           description: User must be logged-in
       security:
         - moneytransfer_auth: []
-        
+
   /user/{userId}:
     get:
       tags:
@@ -193,20 +177,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetUser'          
+                $ref: '#/components/schemas/GetUser'
             application/xml:
               schema:
                 $ref: '#/components/schemas/GetUser'
         '400':
           description: Invalid username supplied
         '401':
-          description: User must be a logged-in admin 
+          description: User must be a logged-in admin
         '404':
           description: User not found
-      security: 
-        - moneytransfer_auth: 
+      security:
+        - moneytransfer_auth:
           - admin
-          
+
     delete:
       tags:
         - user
@@ -227,18 +211,18 @@ paths:
         '400':
           description: Invalid userId supplied
         '401':
-          description: User must be a logged-in admin 
+          description: User must be a logged-in admin
         '404':
           description: User not found
-      security: 
-        - moneytransfer_auth: 
+      security:
+        - moneytransfer_auth:
           - admin
-          
+
   /user/replenish:
     put:
       tags:
         - user
-      summary: Replenishes users wallet. 
+      summary: Replenishes users wallet.
       description: Replenishes users wallet. This can only be done by logged-in user.
       operationId: replenishUser
       parameters:
@@ -311,21 +295,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Transaction'          
+                $ref: '#/components/schemas/TransactionData'
             application/xml:
               schema:
-                $ref: '#/components/schemas/Transaction'
+                $ref: '#/components/schemas/TransactionData'
         '400':
-          description: Invalid recipient's username 
+          description: Invalid recipient's username
         '401':
           description: User should be logged-in
         '402':
           description: User has not enough money to send
         '404':
           description: Recipient's username not found
-      security: 
+      security:
         - moneytransfer_auth: []
-        
+
   /transaction/sent:
     get:
       tags:
@@ -340,20 +324,20 @@ paths:
             application/json:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/Transaction'          
+                items:
+                  $ref: '#/components/schemas/TransactionData'
             application/xml:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/Transaction'
+                items:
+                  $ref: '#/components/schemas/TransactionData'
         '401':
           description: User should be logged-in
         '404':
           description: No transaction found
-      security: 
+      security:
         - moneytransfer_auth: []
-        
+
   /transaction/recieved:
     get:
       tags:
@@ -368,20 +352,20 @@ paths:
             application/json:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/Transaction'          
+                items:
+                  $ref: '#/components/schemas/TransactionData'
             application/xml:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/Transaction'
+                items:
+                  $ref: '#/components/schemas/TransactionData'
         '401':
           description: User should be logged-in
         '404':
           description: No transaction found
-      security: 
+      security:
         - moneytransfer_auth: []
-        
+
   /transaction/sent/{username}:
     get:
       tags:
@@ -392,7 +376,7 @@ paths:
       parameters:
         - name: username
           in: path
-          description: 'The username whose "send" transactions should be recieved'   
+          description: 'The username whose "send" transactions should be recieved'
           required: true
           schema:
             type: string
@@ -403,18 +387,18 @@ paths:
             application/json:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/Transaction'          
+                items:
+                  $ref: '#/components/schemas/TransactionData'
             application/xml:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/Transaction'
+                items:
+                  $ref: '#/components/schemas/TransactionData'
         '401':
           description: User must be logged-in admin
         '404':
           description: No transaction found
-      security: 
+      security:
         - moneytransfer_auth:
           - admin
   /transaction/recieved/{username}:
@@ -438,25 +422,25 @@ paths:
             application/json:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/Transaction'          
+                items:
+                  $ref: '#/components/schemas/TransactionData'
             application/xml:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/Transaction'
+                items:
+                  $ref: '#/components/schemas/TransactionData'
         '401':
           description: User must be logged-in admin
         '404':
           description: No transaction found
-      security: 
+      security:
         - moneytransfer_auth:
           - admin
 
 
 components:
   schemas:
-    User:
+    UserData:
       type: object
       properties:
         id:
@@ -481,7 +465,7 @@ components:
         phone:
           type: string
           example: '+380979797979'
-        birthDate: 
+        birthDate:
           type: string
           format: date
           example: '2022-10-22'
@@ -497,6 +481,12 @@ components:
             - 0
             - 1
           example: 0
+        isAdmin:
+          type: string
+          enum:
+            - "0"
+            - "1"
+          example: "0"
       xml:
         name: user
     GetUser:
@@ -521,7 +511,7 @@ components:
         phone:
           type: string
           example: '+380979797979'
-        birthDate: 
+        birthDate:
           type: string
           format: date
           example: '2022-10-22'
@@ -532,6 +522,12 @@ components:
             - 0
             - 1
           example: 0
+        isAdmin:
+          type: string
+          enum:
+            - "0"
+            - "1"
+          example: "0"
       xml:
         name: getuser
     CreateUser:
@@ -555,10 +551,16 @@ components:
         phone:
           type: string
           example: '+380979797979'
-        birthDate: 
+        birthDate:
           type: string
           format: date
           example: '2022-10-02'
+        isAdmin:
+          type: string
+          enum:
+            - "0"
+            - "1"
+          example: "0"
       xml:
         name: createuser
     UserToUpdate:
@@ -581,7 +583,7 @@ components:
           example: '+380979797979'
       xml:
         name: usertoupdate
-    Transaction:
+    TransactionData:
       type: object
       properties:
         id:
@@ -590,9 +592,11 @@ components:
           example: 7
         sentByUser:
           type: integer
+          $ref: '#/components/schemas/UserData'
           example: sentByUserid
         sentToUser:
           type: integer
+          $ref: '#/components/schemas/UserData'
           example: sentToUserid
         value:
           type: number
@@ -604,6 +608,23 @@ components:
           example: '2020-02-22'
       xml:
         name: transaction
+    CreateTransaction:
+      type: object
+      properties:
+        sentByUser:
+          type: integer
+          $ref: '#/components/schemas/UserData'
+          example: theUser
+        sentToUser:
+          type: integer
+          $ref: '#/components/schemas/UserData'
+          example: John
+        value:
+          type: number
+          format: double
+          example: 45.5
+      xml:
+        name: createuser
   securitySchemes:
     moneytransfer_auth:
       type: oauth2
